@@ -1,0 +1,19 @@
+version: "3.8"
+services:
+  db-sqlite:
+    image: alpine:latest
+    volumes:
+      - ./pcapData:/pcapData
+    command: sh -c "touch /pcapData/pcapData.sqlite && ls -l /app/pcapData"
+  backend:
+    depends_on:
+      - db-sqlite
+    build: ./pcap-backend
+    ports:
+      - 3000:3000
+  frontend:
+    depends_on:
+      - backend
+    build: ./pcap-frontend
+    ports:
+      - 5173:5173
