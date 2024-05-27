@@ -9,10 +9,10 @@ def analyze_pcap(pcap_data):
 
     for packet in packets:
         try:
-            proto = str(packet.proto)  # Try to access proto attribute
+            proto = str(packet.proto)
             len = str(packet.len)
         except AttributeError:
-            proto = None  # Set proto to None if attribute is not available
+            proto = None
             len  = None
         
         packet_info = {
@@ -29,19 +29,16 @@ def analyze_pcap(pcap_data):
 
 
 if __name__ == "__main__":
-    pcap_data = sys.stdin.buffer.read()  # Read PCAP data from stdin
+    pcap_data = sys.stdin.buffer.read()
     analysis_result = analyze_pcap(pcap_data)
     
-    # Convert to JSON serializable format
     analysis_result_serializable = []
     for item in analysis_result:
         try:
             json.dumps(item)
             analysis_result_serializable.append(item)
         except TypeError:
-            # If serialization fails, convert to string representation
             item['summary'] = str(item['summary'])
             analysis_result_serializable.append(item)
     
-    # Serialize the serializable list to JSON
     print(json.dumps(analysis_result_serializable))
