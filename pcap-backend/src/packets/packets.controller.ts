@@ -9,8 +9,6 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as csv from 'csv-parser';
-import * as pcapParser from 'pcap-parser';
-
 import { Readable } from 'stream';
 import { PacketService } from './packet.service';
 import { spawn } from 'child_process';
