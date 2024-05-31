@@ -4,7 +4,6 @@ import json
 from scapy.all import rdpcap
 from io import BytesIO
 
-
 def analyze_pcap(pcap_data):
     packets = rdpcap(BytesIO(pcap_data))
     result = []
