@@ -20,20 +20,27 @@ const DropzoneModal = ({ opened, close, refetch }: IProps) => {
   const [fileInfo, setFileInfo] = React.useState<FileWithPath>();
 
   const handleSubmit = () => {
-    uploadFile(fileInfo as FileWithPath).then(() => {
-      notifications.show({
-        id: "hello-there",
-        withCloseButton: true,
-        autoClose: 1000,
-        title: "File Accepted",
-        message: "The CSV file has been successfully uploaded",
-        className: "my-notification-class",
-        color: "green",
+    uploadFile(fileInfo as FileWithPath)
+      .then((data) => {
+        notifications.show({
+          id: "hello-there",
+          withCloseButton: true,
+          autoClose: 1000,
+          title: `${!data.ok ? "File Rejected" : "File Accepted"}`,
+          message: `${
+            !data.ok
+              ? "Please upload a valid CSV/PCAP file"
+              : "The file is uploaded successfully"
+          }`,
+          className: "my-notification-class",
+          color: `${!data.ok ? "red" : "green"}`,
+        });
+        setFileInfo(undefined);
+        close();
+        refetch();
+      })
+      .catch((error) => {
       });
-      setFileInfo(undefined);
-      close();
-      refetch();
-    });
   };
   return (
     <Modal opened={opened} onClose={close} title="Upload the CSV" padding={40}>
@@ -54,7 +61,7 @@ const DropzoneModal = ({ opened, close, refetch }: IProps) => {
           });
         }}
         maxSize={5 * 1024 ** 2}
-        accept={[MIME_TYPES.csv]}
+        accept={[]}
       >
         <Group
           justify="center"
@@ -95,7 +102,7 @@ const DropzoneModal = ({ opened, close, refetch }: IProps) => {
 
           <div>
             <Text size="md" inline>
-              Drag csv files here or click to select files
+              Drag CSV/PCAP files here or click to select files
             </Text>
           </div>
         </Group>

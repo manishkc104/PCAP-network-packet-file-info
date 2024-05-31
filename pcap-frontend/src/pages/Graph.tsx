@@ -4,7 +4,7 @@ import useGetPacketList from "../hooks/useGetPacketList";
 import React from "react";
 
 const Graph = () => {
-  const { data, isLoading } = useGetPacketList();
+  const { data, isLoading } = useGetPacketList({});
   const [transformedData, setTransformedData] = React.useState([]);
 
   React.useEffect(() => {

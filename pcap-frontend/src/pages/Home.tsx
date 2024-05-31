@@ -4,6 +4,7 @@ import PacketList from "./PacketList";
 import { Outlet, RouterProvider, createBrowserRouter } from "react-router-dom";
 import Graph from "./Graph";
 import Sidebar from "../components/Sidebar";
+import FlaggedPackets from "./FlaggedPackets";
 
 const Home = () => {
   const [opened, { toggle }] = useDisclosure();
@@ -40,6 +41,7 @@ const Home = () => {
       children: [
         { path: "/", element: <PacketList /> },
         { path: "/graph", element: <Graph /> },
+        { path: "/flaggedPackets", element: <FlaggedPackets /> },
       ],
     },
   ]);

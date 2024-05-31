@@ -1,10 +1,13 @@
-import { Button, Table } from "@mantine/core";
+import { Button, Checkbox, Table } from "@mantine/core";
 import { Dispatch, SetStateAction } from "react";
 
 interface IProps {
   rows: any;
   open: () => void;
   setPacketDetail: Dispatch<SetStateAction<undefined>>;
+  setSelectedRows: (value: number[]) => void;
+  selectedRows: number[];
+  flaggedPackets: boolean;
 }
 
 const PaginatedTable = (props: IProps) => {
@@ -24,6 +27,20 @@ const PaginatedTable = (props: IProps) => {
       <Table.Tbody>
         {props?.rows?.map((element: any) => (
           <Table.Tr key={element.id}>
+            {props.flaggedPackets ? (
+              <Table.Td>
+                <Checkbox
+                  aria-label="Select Row"
+                  onChange={(event) =>
+                    props.setSelectedRows(
+                      event.currentTarget.checked
+                        ? [...props.selectedRows, element.id]
+                        : props.selectedRows.filter((id) => id !== element.id)
+                    )
+                  }
+                />
+              </Table.Td>
+            ) : null}
             <Table.Td>{element.id}</Table.Td>
             <Table.Td>{element.time}</Table.Td>
             <Table.Td>{element.source}</Table.Td>

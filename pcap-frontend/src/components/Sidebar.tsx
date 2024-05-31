@@ -14,10 +14,17 @@ const Sidebar = () => {
       />
       <NavLink
         component={RouterNavLink}
+        to="/flaggedPackets"
+        label="Flagged Packets"
+        active={location.pathname === "/flaggedPackets"}
+      />
+      <NavLink
+        component={RouterNavLink}
         to="/graph"
         label="Graph"
         active={location.pathname === "/graph"}
       />
+      
     </>
   );
 };

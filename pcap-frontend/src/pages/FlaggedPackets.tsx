@@ -1,42 +1,39 @@
 import { Box, Button, Flex, Input, Pagination } from "@mantine/core";
 import PaginatedTable from "../components/PaginatedTable";
-import DropzoneModal from "../components/DropzoneModal";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import React from "react";
 import PacketDetailModal from "../components/PacketDetailModal";
 import useGetPacketList from "../hooks/useGetPacketList";
 import { useMutation } from "@tanstack/react-query";
-import { postFlaggedPackets } from "../api";
+import { postunFlaggedPackets } from "../api";
 import { useNavigate } from "react-router-dom";
 
 const PacketList = () => {
-  const [opened, { open, close }] = useDisclosure(false);
   const [value, setValue] = React.useState("");
   const [debounced] = useDebouncedValue(value, 500);
   const [page, setPage] = React.useState(0);
   const [packetId, setPacketDetailId] = React.useState();
   const [selectedRows, setSelectedRows] = React.useState<number[]>();
-  const [flaggedPackets, setFlaggedPackets] = React.useState(false);
+  const [unFlaggedPackets, setUnflaggedPackets] = React.useState(false);
+  const navigate = useNavigate();
 
   const [detailOpened, { open: detailOpen, close: detailClose }] =
     useDisclosure(false);
 
-  const navigate = useNavigate();
-
   const pageNumber = 12;
 
-  const { data, refetch } = useGetPacketList({
+  const { data } = useGetPacketList({
     page,
     pageNumber,
-    searchTerm: debounced,
+    isFlagged: true,
   });
 
   const mutation = useMutation({
     mutationFn: (data: number[]) => {
-      return postFlaggedPackets(data);
+      return postunFlaggedPackets(data);
     },
     onSuccess: () => {
-      navigate("/flaggedPackets");
+      navigate("/");
     },
   });
 
@@ -53,18 +50,7 @@ const PacketList = () => {
           radius="md"
           onChange={(event) => setValue(event.currentTarget.value)}
         />
-        <Button
-          variant="filled"
-          size="md"
-          ml="md"
-          radius="md"
-          onClick={() => {
-            open();
-          }}
-        >
-          Upload File (CSV/PCAP)
-        </Button>
-        {!flaggedPackets ? (
+        {!unFlaggedPackets ? (
           <Button
             variant="filled"
             color="pink"
@@ -72,23 +58,23 @@ const PacketList = () => {
             ml="md"
             radius="md"
             onClick={() => {
-              setFlaggedPackets(true);
+              setUnflaggedPackets(true);
             }}
           >
-            Flag Packets
+            Unflag Packets
           </Button>
         ) : null}
       </Flex>
       <PaginatedTable
         rows={data?.data}
         open={detailOpen}
-        flaggedPackets={flaggedPackets}
+        flaggedPackets={unFlaggedPackets}
         selectedRows={selectedRows || []}
         setSelectedRows={setSelectedRows}
         setPacketDetail={setPacketDetailId}
       />
       <Flex justify="flex-end" mt="xl">
-        {flaggedPackets ? (
+        {unFlaggedPackets ? (
           <Box>
             <Button
               variant="filled"
@@ -109,7 +95,7 @@ const PacketList = () => {
               radius="sm"
               onClick={() => {
                 setSelectedRows([]);
-                setFlaggedPackets(false);
+                setUnflaggedPackets(false);
               }}
             >
               Cancel
@@ -122,7 +108,7 @@ const PacketList = () => {
           onChange={setPage}
         />
       </Flex>
-      <DropzoneModal opened={opened} close={close} refetch={refetch} />
+
       {packetId ? (
         <PacketDetailModal
           opened={detailOpened}

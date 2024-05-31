@@ -24,5 +24,8 @@ export class Packet {
   info: string;
 
   @Column({ nullable: true })
+  isFlagged: boolean;
+
+  @Column({ nullable: true })
   createdAt: Date;
 }

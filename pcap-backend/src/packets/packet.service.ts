@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { PageMetaDto } from 'src/dto/page-meta.dto';
 import { PageDTO } from 'src/dto/page.dto';
 import { Packet } from 'src/entities/Packet';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class PacketService {
@@ -11,14 +11,33 @@ export class PacketService {
     @InjectRepository(Packet) private packetRepository: Repository<Packet>,
   ) {}
 
-  async getPacket(page: number, pageSize: number, searchTerm: string) {
+  async updatedPackets(packetIds: number[], isFlagged: boolean) {
+    const queryBuilder = this.packetRepository.createQueryBuilder('packets');
+    const result = await queryBuilder
+      .update(Packet)
+      .set({ isFlagged })
+      .where({ id: In(packetIds) })
+      .execute();
+    return result;
+  }
+
+  async getPacketData(
+    page: number,
+    pageSize: number,
+    searchTerm: string,
+    isFlagged?: string,
+  ) {
     const offset = (page - 1) * pageSize;
+    const booleanIsFlagged = isFlagged === 'true' ? true : false;
     const queryBuilder = this.packetRepository.createQueryBuilder('packets');
     if (searchTerm) {
       queryBuilder.where(
         'packets.source LIKE :searchTerm OR packets.destination LIKE :searchTerm',
         { searchTerm: `%${searchTerm}%` },
       );
+    }
+    if (booleanIsFlagged) {
+      queryBuilder.where({ isFlagged: booleanIsFlagged });
     }
     queryBuilder
       .orderBy('packets.createdAt', 'ASC')
@@ -45,6 +64,7 @@ export class PacketService {
       packet.protocol = packetInfo.Protocol;
       packet.length = packetInfo.Length;
       packet.info = packetInfo.Info;
+      packet.isFlagged = false;
       packet.createdAt = new Date();
       return packet;
     });
