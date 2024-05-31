@@ -49,7 +49,6 @@ export class PacketsController {
       if (!file) {
         throw new BadRequestException('No file uploaded');
       }
-      console.log({ file });
       if (
         file.mimetype !== 'text/csv' &&
         file.mimetype !== 'application/octet-stream' &&
@@ -101,7 +100,6 @@ export class PacketsController {
           }
           try {
             const formattedData = JSON.parse(output);
-            console.log({ formattedData });
             const result =
               await this.packetService.uploadPacketDetail(formattedData);
             resolve(result);
