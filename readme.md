@@ -24,7 +24,7 @@
 
 Managing and understanding network traffic is essential for maintaining secure and efficient systems. The application simplifies this process by allowing users to upload CSV files that reference packet capture (pcap) files. These files contain detailed data about network traffic, the application uses this data to create interactive graphs that show the connections between different devices on the network. Additionally, the application includes powerful search and filter tools, making it easy to find specific information and examine the details of the pcap files.
 
-https://github.com/manishkc104/PCAP-network-packet-file-info/assets/43213617/dd7f0817-fc91-4a47-8830-32fdd5b775d3
+![Package Viewer Images](packerViewFlow.jpg)
 ## Built With
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
