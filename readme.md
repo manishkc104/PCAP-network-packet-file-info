@@ -24,6 +24,8 @@
 
 Managing and understanding network traffic is essential for maintaining secure and efficient systems. The application simplifies this process by allowing users to upload CSV files that reference packet capture (pcap) files. These files contain detailed data about network traffic, the application uses this data to create interactive graphs that show the connections between different devices on the network. Additionally, the application includes powerful search and filter tools, making it easy to find specific information and examine the details of the pcap files.
 
+https://github.com/manishkc104/sustainable-energy-G8-webpanel-visualization/assets/43213617/85d5e6cf-7239-405e-98dd-cd97aec0b500
+
 ## Built With
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
