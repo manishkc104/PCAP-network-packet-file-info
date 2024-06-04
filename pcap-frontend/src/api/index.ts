@@ -43,9 +43,9 @@ const postunFlaggedPackets = async (packets: number[]) => {
   return result;
 };
 
-const uploadFile = async (file: File) => {
+const uploadFile = async (files: File[]) => {
   const formData = new FormData();
-  formData.append("file", file);
+  files.forEach((file) => formData.append("files", file));
   const response = await post(`${API}/packets/upload`, formData);
   return response;
 };
