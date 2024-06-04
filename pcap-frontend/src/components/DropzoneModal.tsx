@@ -14,13 +14,20 @@ interface IProps {
   opened: boolean;
   close: () => void;
   refetch: any;
+  setUpLoadLoading: (value: boolean) => void;
 }
 
-const DropzoneModal = ({ opened, close, refetch }: IProps) => {
-  const [fileInfo, setFileInfo] = React.useState<FileWithPath>();
+const DropzoneModal = ({
+  opened,
+  close,
+  refetch,
+  setUpLoadLoading,
+}: IProps) => {
+  const [fileInfo, setFileInfo] = React.useState<FileWithPath[]>([]);
 
   const handleSubmit = () => {
-    uploadFile(fileInfo as FileWithPath)
+    setUpLoadLoading(true);
+    uploadFile(fileInfo as FileWithPath[])
       .then((data) => {
         notifications.show({
           id: "hello-there",
@@ -35,18 +42,22 @@ const DropzoneModal = ({ opened, close, refetch }: IProps) => {
           className: "my-notification-class",
           color: `${!data.ok ? "red" : "green"}`,
         });
-        setFileInfo(undefined);
+        setFileInfo([]);
         close();
         refetch();
       })
       .catch((error) => {
+        setUpLoadLoading(false);
+      })
+      .finally(() => {
+        setUpLoadLoading(false);
       });
   };
   return (
     <Modal opened={opened} onClose={close} title="Upload the CSV" padding={40}>
       <Dropzone
         onDrop={(file) => {
-          const fileInfo = file[0];
+          const fileInfo = file;
           setFileInfo(fileInfo);
         }}
         onReject={() => {
@@ -107,49 +118,58 @@ const DropzoneModal = ({ opened, close, refetch }: IProps) => {
           </div>
         </Group>
       </Dropzone>
-      {fileInfo ? (
-        <Flex
-          p={10}
-          mt="md"
-          style={{ border: "1px solid grey", borderRadius: "0.4rem" }}
-          align="center"
-          justify="space-between"
-        >
-          <Flex>
-            <IconFileTypeCsv
-              style={{
-                width: rem(25),
-                height: rem(25),
-              }}
-              stroke={1.5}
-            />
-            <Flex direction="column" ml={4}>
-              <Text size="xs">{fileInfo?.name}</Text>
-              <Text size="xs">{fileInfo?.size}</Text>
-            </Flex>
-          </Flex>
-          <Flex>
-            <Button
-              variant="filled"
-              color="red"
-              size="xs"
-              p="0"
-              w={20}
-              h={20}
-              justify="end"
-              onClick={() => setFileInfo(undefined)}
+      {fileInfo?.length > 0
+        ? fileInfo.map((file) => (
+            <Flex
+              p={10}
+              mt="md"
+              style={{ border: "1px solid grey", borderRadius: "0.4rem" }}
+              align="center"
+              key={file?.name}
+              justify="space-between"
             >
-              <IconX
-                style={{
-                  width: rem(25),
-                  height: rem(25),
-                }}
-                stroke={1.5}
-              />
-            </Button>
-          </Flex>
-        </Flex>
-      ) : null}
+              <Flex>
+                <IconFileTypeCsv
+                  style={{
+                    width: rem(25),
+                    height: rem(25),
+                  }}
+                  stroke={1.5}
+                />
+                <Flex direction="column" ml={4}>
+                  <Text size="xs">{file?.name}</Text>
+                  <Text size="xs">{file?.size}</Text>
+                </Flex>
+              </Flex>
+              <Flex>
+                <Button
+                  variant="filled"
+                  color="red"
+                  size="xs"
+                  p="0"
+                  w={20}
+                  h={20}
+                  justify="end"
+                  onClick={() =>
+                    setFileInfo(
+                      fileInfo.filter(
+                        (fileInfo: any) => fileInfo.name !== file.name
+                      )
+                    )
+                  }
+                >
+                  <IconX
+                    style={{
+                      width: rem(25),
+                      height: rem(25),
+                    }}
+                    stroke={1.5}
+                  />
+                </Button>
+              </Flex>
+            </Flex>
+          ))
+        : null}
 
       <Flex justify="flex-end">
         <Button
