@@ -6,10 +6,10 @@ import {
   Post,
   Put,
   Query,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import * as csv from 'csv-parser';
 import { Readable } from 'stream';
 import { PacketService } from './packet.service';
@@ -43,77 +43,99 @@ export class PacketsController {
   }
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(@UploadedFile() file) {
+  @UseInterceptors(FilesInterceptor('files'))
+  async uploadFile(@UploadedFiles() files: Express.Multer.File[]) {
+    if (!files || files.length === 0) {
+      throw new BadRequestException('No files uploaded');
+    }
+
+    try {
+      const fileProcessing = files.map((file) => this.processFile(file));
+      const results = await Promise.all(fileProcessing);
+      return { success: true, results };
+    } catch (error) {}
+  }
+
+  async processFile(file) {
+    if (
+      file.mimetype !== 'text/csv' &&
+      file.mimetype !== 'application/octet-stream' &&
+      file.mimetype !== 'application/vnd.tcpdump.pcap'
+    ) {
+      throw new BadRequestException('Uploaded file is not a CSV/PCAP file');
+    }
+
+    if (file.mimetype === 'text/csv') {
+      const result = await this.processCSV(file);
+      return result;
+    } else {
+      const result = await this.processPcap(file);
+      return result;
+    }
+  }
+
+  async processCSV(file) {
     return new Promise((resolve, reject) => {
-      if (!file) {
-        throw new BadRequestException('No file uploaded');
-      }
-      if (
-        file.mimetype !== 'text/csv' &&
-        file.mimetype !== 'application/octet-stream' &&
-        file.mimetype !== 'application/vnd.tcpdump.pcap'
-      ) {
-        throw new BadRequestException('Uploaded file is not a CSV/PCAP file');
-      }
+      const csvString = file.buffer.toString();
+      const stream = Readable.from([csvString]);
+      const results = [];
 
-      if (file.mimetype === 'text/csv') {
-        const csvString = file.buffer.toString();
-        const stream = Readable.from([csvString]);
-        const results = [];
-        stream
-          .pipe(csv())
-          .on('data', (data) => results.push(data))
-          .on('end', async () => {
-            try {
-              const result =
-                await this.packetService.uploadPacketDetail(results);
-              resolve(result);
-            } catch (error) {
-              reject(error);
-            }
-          })
-          .on('error', (error) => {
-            reject(error);
-          });
-      } else {
-        const pythonProcess = spawn('python', ['../analyze_pcap.py']);
-
-        let output = '';
-        let errorOutput = '';
-
-        pythonProcess.stdout.on('data', (data) => {
-          output += data.toString();
-        });
-
-        pythonProcess.stderr.on('data', (data) => {
-          errorOutput += data.toString();
-        });
-
-        pythonProcess.on('close', async (code) => {
-          if (code !== 0) {
-            return reject(
-              new BadRequestException(
-                `Python script exited with code ${code}: ${errorOutput}`,
-              ),
-            );
-          }
+      stream
+        .pipe(csv())
+        .on('data', (data) => results.push(data))
+        .on('end', async () => {
           try {
-            const formattedData = JSON.parse(output);
-            const result =
-              await this.packetService.uploadPacketDetail(formattedData);
+            const result = await this.packetService.uploadPacketDetail(results);
             resolve(result);
-          } catch (err) {
-            reject(
-              new BadRequestException(
-                `Error parsing JSON output: ${err.message}`,
-              ),
-            );
+          } catch (error) {
+            reject(error);
           }
+        })
+        .on('error', (error) => {
+          reject(error);
         });
-        pythonProcess.stdin.write(file.buffer);
-        pythonProcess.stdin.end();
-      }
+    });
+  }
+
+  async processPcap(file) {
+    console.log({ file });
+    return new Promise((resolve, reject) => {
+      const pythonProcess = spawn('python', ['../analyze_pcap.py']);
+      let output = '';
+      let errorOutput = '';
+
+      pythonProcess.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+
+      pythonProcess.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+
+      pythonProcess.on('close', async (code) => {
+        if (code !== 0) {
+          return reject(
+            new BadRequestException(
+              `Python script exited with code ${code}: ${errorOutput}`,
+            ),
+          );
+        }
+        try {
+          const formattedData = JSON.parse(output);
+          const result =
+            await this.packetService.uploadPacketDetail(formattedData);
+          resolve(result);
+        } catch (err) {
+          reject(
+            new BadRequestException(
+              `Error parsing JSON output: ${err.message}`,
+            ),
+          );
+        }
+      });
+
+      pythonProcess.stdin.write(file.buffer);
+      pythonProcess.stdin.end();
     });
   }
 }
