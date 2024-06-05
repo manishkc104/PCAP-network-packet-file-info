@@ -45,12 +45,13 @@ Managing and understanding network traffic is essential for maintaining secure a
 
 **CSV Indexing**: Upload CSV files that reference and index multiple pcap files for streamlined analysis.
 
+**CSV Indexing**: Upload multiple network pcap files.
+
 **Network Visualization**: Dynamic, interactive graphs that display the connections between devices based on pcap data..
 
 **Customizable Filters**: Filter data based on IP addresses, timeframes, protocols, ports, and more.
 
 **Packet Details**:  Access detailed information about individual packets, including source and destination IP addresses, ports, protocols, and payload data.
-
 
 **Dockerizing React Applications with Vite**: Dockerized React application
 
