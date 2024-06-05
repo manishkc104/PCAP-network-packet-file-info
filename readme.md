@@ -47,7 +47,9 @@ Managing and understanding network traffic is essential for maintaining secure a
 
 **CSV Indexing**: Upload multiple network pcap files.
 
-**Network Visualization**: Dynamic, interactive graphs that display the connections between devices based on pcap data..
+**Network Visualization**: Dynamic, interactive graphs that display the connections between devices based on pcap data.
+
+**Flagged Packets**: Flag the packets for further visualization and inspection.
 
 **Customizable Filters**: Filter data based on IP addresses, timeframes, protocols, ports, and more.
 
