@@ -102,5 +102,5 @@ npm start
 ```
 ## To run build and run the docker container 
 ```sh
-cd docker-compose --build
+docker-compose --build
 ```
