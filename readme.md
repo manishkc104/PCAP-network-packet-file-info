@@ -70,12 +70,37 @@ Make sure you have the following installed on your machine:
 - [npm](https://www.npmjs.com/)
 - [Docker](https://www.docker.com/products/docker-desktop/)
 
-### Clone the repo
+### Installation Guide 
+
+## Clone Repository
 
 ```sh
 git clone https://github.com/manishkc104/PCAP-network-packet-file-info.git
 ```
+## Navigate to the cloned repository:
 
 ```sh
-cd docker-explore
+cd PCAP-network-packet-file-info
+```
+## Navigate to the frontend directory::
+```sh
+cd pcap-frontend
+```
+## Run npm run dev to start the frontend development server
+```sh
+npm run dev
+```
+
+## Navigate to the backend directory::
+```sh
+cd pcap-backend
+```
+
+## Run npm start to start the backend development server
+```sh
+npm start
+```
+## To run build and run the docker container 
+```sh
+cd docker-compose --build
 ```
